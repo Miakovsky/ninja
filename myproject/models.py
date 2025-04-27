@@ -75,9 +75,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name = 'order_items', on_delete = models.CASCADE)
+    order = models.ForeignKey(Order, related_name = 'items', on_delete = models.CASCADE)
     product = models.ForeignKey(Product, on_delete = models.CASCADE)
-    cost = models.DecimalField(max_digits = 10, decimal_places = 2)
+    price = models.DecimalField(max_digits = 10, decimal_places = 2)
     quantity = models.PositiveBigIntegerField(default = 1)
 
     class Meta:

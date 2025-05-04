@@ -26,12 +26,12 @@ class ProductIn(Schema):
     description: str
     price: float 
 
-@api.post("/categories")
+@api.post("/create_category")
 def create_category(request, payload: CategoryIn):
     category = Category.objects.create(**payload.dict())
     return {"id": category.id}
 
-@api.post("/products")
+@api.post("/create_product")
 def create_product(request, payload: ProductIn, image: UploadedFile = File(...)):
     payload_dict = payload.dict()
     category = get_object_or_404(Category, slug=payload_dict.pop('category'))
@@ -58,17 +58,17 @@ class ProductFilter(Schema):
     title: Optional[str]
     description: Optional[str]
 
-@api.get("/categories/{category_slug}", response=CategoryOut)
+@api.get("/category/{category_slug}", response=CategoryOut)
 def get_category(request, category_slug: str):
     category = get_object_or_404(Category, slug=category_slug)
     return category
 
-@api.get("/products/{product_id}", response=ProductOut)
+@router.get("/product/{product_id}", response=ProductOut)
 def get_product(request, product_id: int):
     product = get_object_or_404(Product, id=product_id)
     return product
 
-@router.get("/categories", response=List[CategoryOut])
+@api.get("/categories", response=List[CategoryOut])
 def list_categories(request):
     qs = Category.objects.all()
     return qs
@@ -135,9 +135,6 @@ class UserOut(Schema):
     username: str
     email: str
 
-class Hello(Schema):
-    username: str
-
 @api.get('/user')
 def get_user(request):
     print('GET_USER began')
@@ -147,12 +144,6 @@ def get_user(request):
     else:
         raise HttpError(401, 'pls login')
 
-@api.post('/hello')
-def hello(request):
-    if request.user.is_authenticated:
-         return ('hello, '+ request.user.username)
-    else:
-        raise HttpError(401, 'pls login')
     
 @api.get('/users', response = List[UserOut])
 def get_users(request):
@@ -234,14 +225,14 @@ class OrderItemIn(Schema):
     price: float
     quantity: int
 
-@api.get('/wishlist/{user_id}/', response = List[WishlistOut])
+@api.get('/get_wishlist/{user_id}/', response = List[WishlistOut])
 def get_wishlist(request, user_id: int):
     user = get_object_or_404(User, id = user_id)
     wishlist = Wishlist.objects.filter(user = user)
     return wishlist
 
 
-@api.post('/wishlist', response = WishlistOut)
+@api.post('/create_wishlist', response = WishlistOut)
 def create_wishlist(request, payload: WishlistIn):
     payload_dict = payload.dict()
     user = get_object_or_404(User, id = payload_dict.pop('user'))
@@ -278,7 +269,7 @@ def remove_from_wishlist(request, wishlist_id: int):
     return wishlist
 
 
-@api.get('/orders', response = List[OrderItemOut])
+@api.get('/get_orders', response = List[OrderItemOut])
 def list_orders(request):
     return OrderItem.objects.all()
 
